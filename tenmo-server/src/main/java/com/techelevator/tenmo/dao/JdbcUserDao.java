@@ -93,6 +93,34 @@ public class JdbcUserDao implements UserDao {
         return newUser;
     }
 
+    @Override
+    public List<User> getUsersExcludingCurrent(int currentUserId) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT user_id, username FROM tenmo_user WHERE user_id != ?";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, currentUserId);
+            while (results.next()) {
+                User user = mapRowToUserBasic(results);  // Use the new basic mapper method
+                System.out.println("Retrieved user: " + user.getUsername()); // Debug line
+                users.add(user);
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+        return users;
+    }
+
+    // New basic mapper method for retrieving only user_id and username
+    private User mapRowToUserBasic(SqlRowSet rs) {
+        User user = new User();
+        user.setId(rs.getInt("user_id"));
+        user.setUsername(rs.getString("username"));
+        return user;
+    }
+
+
+
+
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
         user.setId(rs.getInt("user_id"));

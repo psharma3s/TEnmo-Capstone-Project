@@ -9,6 +9,9 @@ public interface UserDao {
 
     List<User> getUsers();
 
+    List<User> getUsersExcludingCurrent(int currentUserId);
+
+
     User getUserById(int id);
 
     User getUserByUsername(String username);
